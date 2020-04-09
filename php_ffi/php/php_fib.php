@@ -19,7 +19,7 @@ echo '[PHP] execution time: '.(microtime(true) - $start).' Result: '.$p.PHP_EOL;
 // =========================== RUST FFI ===========================
 $rust_ffi = FFI::cdef(
     "int Fib(int n);",
-    "../lib/libphp_rust_ffi.so");
+    "lib/libphp_rust_ffi.so");
 
 $start = microtime(true);
 $r = 0;
@@ -32,7 +32,7 @@ echo '[RUST] execution time: '.(microtime(true) - $start).' Result: '.$r.PHP_EOL
 // =========================== CPP FFI ===========================
 $cpp_ffi = FFI::cdef(
     "int Fib(int n);",
-    "../lib/libphp_cpp_ffi.so");
+    "lib/libphp_cpp_ffi.so");
 
 $start = microtime(true);
 $c = 0;
@@ -45,7 +45,7 @@ echo '[CPP] execution time: '.(microtime(true) - $start).' Result: '.$c.PHP_EOL;
 // =========================== GLANG FFI ===========================
 $golang_ffi = FFI::cdef(
     "int Fib(int n);",
-    "../lib/libphp_go_ffi.so");
+    "lib/libphp_go_ffi.so");
 
 $start = microtime(true);
 

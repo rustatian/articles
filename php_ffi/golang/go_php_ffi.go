@@ -5,6 +5,7 @@ import (
 )
 
 // we need to have empty main in package main :)
+// because -buildmode=c-shared requires exactly one main package
 func main() {
 
 }

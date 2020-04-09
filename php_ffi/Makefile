@@ -11,3 +11,7 @@ build_rust:
 	cargo build --manifest-path rust/Cargo.toml --release && mv rust/target/release/libphp_ffi.so lib/libphp_rust_ffi.so
 
 build: build_cpp build_go build_rust
+
+
+run:
+	php php/php_fib.php
