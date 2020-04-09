@@ -1,0 +1,21 @@
+[package]
+name = "php_ffi"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+
+[lib]
+crate-type = ["cdylib"]
+
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+debug = false
+debug-assertions = false
+overflow-checks = false
+panic = 'abort'
+incremental = false
+rpath = false
+codegen-units = 1
