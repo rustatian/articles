@@ -24,8 +24,68 @@ $ffi = FFI::cdef(
 2. `int Fib(int n)` - это название экспортируемого метода компиллируемого языка. Чуть ниже мы поговорим как это правильно сделать.Warning
 3. `/PATH/TO/SO/lib.so` - путь к динамической библиотеке в которой находится функция выше.
 
+Полный скрипт на php, который мы будем использовать:
+```php
+<?php
+// =========================== PHP NATIVE ===========================
+function fib($n)
+{
+    if ($n === 1 || $n === 2) {
+        return 1;
+    }
+    return fib($n - 1) + fib($n - 2);
+}
 
-Давайте попробуем сделать эту динамическую библиотеку на языке Rust ([link](https://www.rust-lang.org/))
+$start = microtime(true);
+$p = 0;
+for ($i = 0; $i < 1000000; $i++) {
+    $p = fib(12);
+}
+
+echo '[PHP] execution time: '.(microtime(true) - $start).' Result: '.$p.PHP_EOL;
+
+// =========================== RUST FFI ===========================
+$rust_ffi = FFI::cdef(
+    "int Fib(int n);",
+    "lib/libphp_rust_ffi.so");
+
+$start = microtime(true);
+$r = 0;
+for ($i=0; $i < 1000000; $i++) { 
+   $r = $rust_ffi->Fib(12);
+}
+
+echo '[RUST] execution time: '.(microtime(true) - $start).' Result: '.$r.PHP_EOL;
+
+// =========================== CPP FFI ===========================
+$cpp_ffi = FFI::cdef(
+    "int Fib(int n);",
+    "lib/libphp_cpp_ffi.so");
+
+$start = microtime(true);
+$c = 0;
+for ($i=0; $i < 1000000; $i++) { 
+   $c = $cpp_ffi->Fib(12);
+}
+
+echo '[CPP] execution time: '.(microtime(true) - $start).' Result: '.$c.PHP_EOL;
+
+// =========================== GLANG FFI ===========================
+$golang_ffi = FFI::cdef(
+    "int Fib(int n);",
+    "lib/libphp_go_ffi.so");
+
+$start = microtime(true);
+
+for ($i=0; $i < 1000000; $i++) { 
+   $golang_ffi->Fib(12);
+}
+
+echo '[GOLANG] execution time: '.(microtime(true) - $start).' Result: '.$c.PHP_EOL;
+```
+
+
+Первый шагом сделаем динамическую библиотеку на языке Rust ([link](https://www.rust-lang.org/))
 Для этого потребуется подготовка:
 1. На любой платформе, для установки нам потребуется всего лишь одна инструкция отсюда - [link](https://rustup.rs)
 2. После этого создадим проект в любом месте командой `cargo new rust_php_ffi`. И все)
@@ -118,6 +178,28 @@ func Fib(n C.int) C.int {
 
 Запуск ракеты:
 После того, как мы все написали (исходные коды предоставлены), мы можем сделать небольшое Makefile чтобы все это собрать (так-же находится в репозитории). После того, как мы вызовем `make build` в папке `lib` появится 4 файла. 2 для ГО (.h/.so) и по одному для Rust и С++.
+
+Makefile:
+```makefile
+build_cpp:
+	echo 'Building cpp...'
+	cd cpp && g++ -fPIC -O3 -shared src/php_cpp_ffi.cpp -o libphp_cpp_ffi.so
+
+build_go:
+	echo 'Building golang...'
+	cd golang && go build -o libphp_go_ffi.so -buildmode=c-shared
+
+build_rust:
+	echo 'Building Rust...'
+	cargo build --release && mv rust/target/release/libphp_ffi.so libphp_rust_ffi.so
+
+build: build_cpp build_go build_rust
+
+
+run:
+	php php/php_fib.php
+```
+
 После чего мы можем перейти в папку `php` и запустить наш скрипт (или чезез Makefile - `make run`). Хочу так-же обратить внимание, что в php скрипте в `FFI::cdef` захардкожены пути к `.so` файлам, поэтому чтобы все сработало, запускайте пожалуйста через `make run`. Результат работы следующий:
 1. [PHP] execution time: 8.6763260364532 Result: 144
 2. [RUST] execution time: 0.32162690162659 Result: 144
