@@ -22,8 +22,6 @@ $ffi = FFI::cdef(
 
 1. `FFI::cdef` - этой операцией мы определяем интерфейс взаимодействия.
 2. `int Fib(int n)` - это название экспортируемого метода компиллируемого языка. Чуть ниже мы поговорим как это правильно сделать.Warning
-
-This extension is EXPERIMENTAL. The behaviour of this extension including the names of its functions and any other documentation surrounding this extension may change without notice in a future release of PHP. This extension should be used at your own risk.
 3. `/PATH/TO/SO/lib.so` - путь к динамической библиотеке в которой находится функция выше.
 
 
