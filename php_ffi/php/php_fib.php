@@ -42,7 +42,7 @@ for ($i=0; $i < 1000000; $i++) {
 
 echo '[CPP] execution time: '.(microtime(true) - $start).' Result: '.$c.PHP_EOL;
 
-// =========================== GLANG FFI ===========================
+// =========================== GOLANG FFI ===========================
 $golang_ffi = FFI::cdef(
     "int Fib(int n);",
     "lib/libphp_go_ffi.so");
