@@ -19,7 +19,7 @@ Input: [0,1]
 Output: 0
 ```
 
-So, there are at least 2 solution to solve this problem (I'll write it down in my favorite programming language - Rust). First solution is simple, we will go from first number in range over the all presenten numbers (last number is included)
+So, there are at least 2 solutions to solve this problem (I'll write it down in my favorite programming language - Rust). First solution is simple, we will go from first number in range over the all presented numbers (last number is included)
 ```
 9   -- |0|0|0|0|1|0|0|1|
 10  -- |0|0|0|0|1|0|1|0|
@@ -38,13 +38,16 @@ So, there are at least 2 solution to solve this problem (I'll write it down in m
         res
     }
 ```
-But imagine if we would have m = 1 and n = 2147483647. Uhh, it would be very heave operation. If we try it out, it will cost us near ~730ms (it's not a mistake, almost 1 second). Let's turn on our brain and try to optimize this solution.
-Let's remember how bitwise AND works ([Tap](https://en.wikipedia.org/wiki/Bitwise_operation))
+But imagine if we would have following boundaries: `m = 1` and `n = 2147483647`. Uhh, it would be very heavy operation. If we try it out, it will cost us near ~730ms (it's not a mistake, almost 1 second). Let's turn on our brain and try to optimize this solution.
+Let's remember how bitwise AND works: ([Tap](https://en.wikipedia.org/wiki/Bitwise_operation))
+
+```
     0101 (decimal 5)
 AND 0011 (decimal 3)
   = 0001 (decimal 1)
+```
 
-So, only if in both numbers bit would be equal to 1, result would have this bit set to 1, otherwise - zero. Let's take a look at the m = 9 and n = 12 sequence presented earlier.
+So, we get 1 bit set only if in both numbers bit is equal to 1, otherwise - bit will set to zero. Let's take a look at the `m = 9` and `n = 12` sequence presented earlier.
 
 ```
 9   -- |0|0|0|0|1|0|0|1|
@@ -52,10 +55,11 @@ So, only if in both numbers bit would be equal to 1, result would have this bit 
 11  -- |0|0|0|0|1|0|1|1|
 12  -- |0|0|0|0|1|1|0|0|
 ```
-Oh, I have an idea, 4-th bit is set to 1 in all numbers in that sequence. Good. So, if we found that common bit we could set it in the result number, because as we know, all other bits will be 0 during computation.
+
+Do you see that? 1-th column. Oh, I have an idea, 4-th bit is set to 1 in all numbers in that sequence. Good. So, if we found that common bit we could set it in the result number, because as we know, all other bits will be 0 during computation.
 Also, we know the size of the number from the description - [2147483647](https://en.wikipedia.org/wiki/2,147,483,647). 32 bits. 
-With that knoledge we can iterate from 0 to 32 (exclusive) and try to make a RIGHT SHIFT operation until `m` is less that `n` (remember, by description, m is always less than n). Why? Because when `n` became less or equal than `m` it would mean that we find that common prefix (further will be only zeros), both numbers now have bit 1 in position 0. Why only 2 numbers in that sequence, first and last? Because if we find that prefix on fist and the last numbers it would mean that all bits before will be 0 during AND operation. 
-Let's see this on sample:
+With that knowledge we can iterate from 0 to 32 (exclusive) and try to make a RIGHT SHIFT operation until `m` is less that `n` (remember, by description, m is always less than n). Why? Because when `n` became less or equal than `m` it would mean that we find that common prefix (further will be only zeros), both numbers now have bit 1 in position 0. Why only 2 numbers in that sequence, first and last? Because if we find that prefix on fist and the last numbers it would mean that all bits before will be 0 during AND operation on whole sequence. 
+Let's take a look at that sample:
 ```
 9   -- 0 0 0 0 1 0 0 1
 12  -- 0 0 0 0 1 1 0 0
