@@ -16,13 +16,13 @@ Input: [0,1]
 Output: 0
 ```
 
-So, there are at least 2 solution of this probles (I'll write it down in my favorite programming language - Rust). First - simple, we will go from first number in range over the all presenten numbers (last number is included)
-
-9   -- 0 0 0 0 1 0 0 1
-10  -- 0 0 0 0 1 0 1 0
-11  -- 0 0 0 0 1 0 1 1
-12  -- 0 0 0 0 1 1 0 0
-
+So, there are at least 2 solution of this probles (I'll write it down in my favorite programming language - Rust). First solution is simple, we will go from first number in range over the all presenten numbers (last number is included)
+```
+9   -- |0|0|0|0|1|0|0|1|
+10  -- |0|0|0|0|1|0|1|0|
+11  -- |0|0|0|0|1|0|1|1|
+12  -- |0|0|0|0|1|1|0|0|
+```
 Итак, у нас числа. За O(n) решение простое. Просто присваиваем переменной первое число из последовательности и делаем в цикле до последнего AND
 Последовательность от m до n
 res = m
