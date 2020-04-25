@@ -1,3 +1,6 @@
+#SpiralScout LeetCode 1 year challenge
+(last month I started SpiralScout LeetCode year challenge)
+
 Bitwise AND of Numbers Range
 
 Interesting LeetCode problem. The description of the problem is the following:
@@ -16,48 +19,80 @@ Input: [0,1]
 Output: 0
 ```
 
-So, there are at least 2 solution of this probles (I'll write it down in my favorite programming language - Rust). First solution is simple, we will go from first number in range over the all presenten numbers (last number is included)
+So, there are at least 2 solution to solve this problem (I'll write it down in my favorite programming language - Rust). First solution is simple, we will go from first number in range over the all presenten numbers (last number is included)
 ```
 9   -- |0|0|0|0|1|0|0|1|
 10  -- |0|0|0|0|1|0|1|0|
 11  -- |0|0|0|0|1|0|1|1|
 12  -- |0|0|0|0|1|1|0|0|
 ```
-Итак, у нас числа. За O(n) решение простое. Просто присваиваем переменной первое число из последовательности и делаем в цикле до последнего AND
-Последовательность от m до n
-res = m
-     for i in m..n
-     res &= i
-return res
-А теперь интересное решение. Как вы видели, в последовательности, еденички выстроились в колонну. Напомню логику бинарного AND
+
+
+```rust
+    pub fn range_bitwise_and(m: i32, n: i32) -> i32 {
+        let mut res = m;
+        for i in m..=n {
+            res &= i;
+        }
+
+        res
+    }
+```
+But imagine if we would have m = 1 and n = 2147483647. Uhh, it would be very heave operation. If we try it out, it will cost us near ~730ms (it's not a mistake, almost 1 second). Let's turn on our brain and try to optimize this solution.
+Let's remember how bitwise AND works ([Tap](https://en.wikipedia.org/wiki/Bitwise_operation))
     0101 (decimal 5)
 AND 0011 (decimal 3)
   = 0001 (decimal 1)
 
-Т.е. все по сути, все числа из последовательности уничножат друг друга. В AND будет 1 только когда в обоих числах бит равен 1. По сути, нам нужно найти этот префикс, где у 1-го и последнего числа будет этот префикс (он будет один, из условия задачи 0 <= m <= n <= 2147483647
-Таким образом, примем, что число 32-х битное (из условия).  Поэтому O(1) будет циклом 0....32 (константное).
-В этом цикле мы будем делать операцию битового сдвига вправо, пока не найдем этот общий префикс. Когда мы его нашли, нам нужно первое число, m сдвинуть уже влево на то количество бит, которое мы сдвигали вправо. Это делается для того, чтобы вернуть биты (хаха) обратно в число. Вопрос - а до куда в цикле идти, сколько сдвигать, как мы поймем, что нашли общий префикс. Сдвигается до того момента, пока число m меньше числа n. Так как когда они сравняются или будет n > m, значит у нас впереди только нули и сдвигать дальше не нужно. Пример в студию. Возьмем числа 9 и 12 (выше)
+So, only if in both numbers bit would be equal to 1, result would have this bit set to 1, otherwise - zero. Let's take a look at the m = 9 and n = 12 sequence presented earlier.
+
+```
+9   -- |0|0|0|0|1|0|0|1|
+10  -- |0|0|0|0|1|0|1|0|
+11  -- |0|0|0|0|1|0|1|1|
+12  -- |0|0|0|0|1|1|0|0|
+```
+Oh, I have an idea, 4-th bit is set to 1 in all numbers in that sequence. Good. So, if we found that common bit we could set it in the result number, because as we know, all other bits will be 0 during computation.
+Also, we know the size of the number from the description - [2147483647](https://en.wikipedia.org/wiki/2,147,483,647). 32 bits. 
+With that knoledge we can iterate from 0 to 32 (exclusive) and try to make a RIGHT SHIFT operation until `m` is less that `n` (remember, by description, m is always less than n). Why? Because when `n` became less or equal than `m` it would mean that we find that common prefix (further will be only zeros), both numbers now have bit 1 in position 0. Why only 2 numbers in that sequence, first and last? Because if we find that prefix on fist and the last numbers it would mean that all bits before will be 0 during AND operation. 
+Let's see this on sample:
+```
 9   -- 0 0 0 0 1 0 0 1
 12  -- 0 0 0 0 1 1 0 0
-сдвигаем вправо, получаем 
+```
+perform a right shift:
+```
 4 -- 0 0 0 0 0 1 0 0
 6 -- 0 0 0 0 0 1 1 0
-m < n - идем дальше
+```
+m < n - moving forward
+```
 2 -- 0 0 0 0 0 0 1 0
 3 -- 0 0 0 0 0 0 1 1
-m < n - идем дальше
+```
+m < n - moving forward
+```
 1 -- 0 0 0 0 0 0 0 1
 1 -- 0 0 0 0 0 0 0 1
-Опа, m равно n. Отлично, самый дальний общий префикс найдет. Напомню, все, что было до этого будет нулями, когда мы будет делать 9&10, 10&11, 11&12 (не так конечно, но упрощенно, что я показывал выше)
-Сдвиг равен 3. А теперь просто двигаем влево на 3 -- 0 0 0 0 1 0 0 0. 1 в четверном бите (третий индекс). 2 * 2 * 2 = 8.
-Проверяем
-9   -- 0 0 0 0 1 0 0 1
-10  -- 0 0 0 0 1 0 1 0
-11  -- 0 0 0 0 1 0 1 1
-12  -- 0 0 0 0 1 1 0 0
+```
+Great, m is equal to n... What's next? We find a prefix (bit) which will be equal to 1. Now, we need to set this bit in result number. LEFT SHIFT TIME :) We performed 3 right shifts, so, let's perform 3 left shift operation on m or n it doesn't matter.
+`0 0 0 0 0 0 0 1` << 3 = `0 0 0 0 1 0 0 0`. Result is 2 * 2 * 2 = 8
 
-Как видите, по пути от 9 к 12 если хоть у 1 числа есть ноль, там, где 1, все, там всегда будет 0. Т.е. получим 
-res = 9&10 0 0 0 0 1 0 0 0
-res&11 =     0 0 0 0 1 0 0 0
-res&12 =    0 0 0 0 1 0 0 0
-Готово)
+Let's see the Rust solution:
+```rust
+    pub fn range_bitwise_and(m: i32, n: i32) -> i32 {
+        let mut shift = 0;
+        let mut mr = m;
+        let mut nr = n;
+
+        while mr < nr {
+            mr >>= 1;
+            nr >>= 1;
+            shift += 1;
+        }
+
+        nr << shift
+    }
+```
+
+Done)
