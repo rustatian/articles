@@ -79,7 +79,7 @@ m < n - moving forward
 1 -- 0 0 0 0 0 0 0 1
 1 -- 0 0 0 0 0 0 0 1
 ```
-Great, m is equal to n... What's next? We find a prefix (bit) which will be equal to 1. Now, we need to set this bit in result number. LEFT SHIFT TIME :) We performed 3 right shifts, so, let's perform 3 left shift operation on m or n it doesn't matter.
+Great, m is equal to n... What's next? We find a prefix (bit) which will be equal to 1. Now, we need to set this bit in result number. LEFT SHIFT TIME :) We performed 3 right shifts, so, let's perform 3 left shift operations on shifted `m` or `n` it doesn't matter.
 `0 0 0 0 0 0 0 1` << 3 = `0 0 0 0 1 0 0 0`. Result is 2 * 2 * 2 = 8
 
 Let's see the Rust solution:
