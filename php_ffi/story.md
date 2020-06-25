@@ -143,8 +143,6 @@ A few comments on the compilation:
   1. `-fPIC` position-independence code. For a dynamic library, it is important to be independent of the address at which it is loaded in memory.
   2. `-O3` - maximum optimization
 
-Golang
-
 And next in line is `Golang`.
 
 That is a language with runtime. A special mechanism for interacting with dynamic libraries was developed for Go, which is called - `CGO` 
