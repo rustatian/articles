@@ -1,12 +1,12 @@
 In this article, we’re going to consider the capabilities of FFI that was introduced in PHP version 7.4, plus we’re going to compare the abilities of PHP to work with such languages as ‘Go’, ‘Rust’, ‘C ++’ without creating plug-ins, but directly. Moreover, we’re going to cover the topic where it is possible to use this function, and where, in our opinion, it’s not worth doing it.
 So, what is FFI: 
 [FFI](https://en.wikipedia.org/wiki/Foreign_function_interface)
-FFI is the ability to call a library function written in one language from another one. For example, as you might guess, it’s possible to call a function written in Rust / C ++ / Go from PHP. In order to connect an interpreted language with a compiled language, the libffi [Repo] library is used (https://en.wikipedia.org/wiki/Libffi). 
+FFI is the ability to call a library function written in one language from another one. For example, as you might guess, it’s possible to call a function written in Rust/C++/Go from PHP. In order to connect an interpreted language with a compiled language, the libffilibrary is used: [Repo](https://en.wikipedia.org/wiki/Libffi). 
 Since the interpreted languages ​​do not know where specifically (in which registers) to search for the parameters of the called function, as well as where to get the results of the function after the call. All this work for interpreted languages ​​is done by Libffi. So, you need to install this library, as  it is part of the system libraries (Linux).
 All the experiments will be conducted on ArchLinux (5.6.1 kernel), Libffi 3.2.1.
 What's the use of it? It is certainly interesting to explore new language features, but is there any practical sense in this? I’m going to try to prove this in the course of the article.
 So, PHP.
-[link] (https://www.php.net/manual/en/intro.ffi.php )
+[link](https://www.php.net/manual/en/intro.ffi.php )
 The title itself immediately describes that at the time of writing, this is an experimental feature of the PHP language.
 For our example, we are taking such an interesting problem as calculating the Fibonacci sequences. And of course, not in the most efficient way, — with the help of recursion. This is done in order to use the processor as much as possible, as well as to prevent compiled languages from optimizing this function (for example, applying the technique of unwinding cycle (https://en.wikipedia.org/wiki/Loop_unrolling )
 
@@ -83,9 +83,9 @@ for ($i=0; $i < 1000000; $i++) {
 echo '[GOLANG] execution time: '.(microtime(true) - $start).' Result: '.$c.PHP_EOL;
 ```
 The first step is to make a dynamic library in the Rust language 
-([link] (https://www.rust-lang.org/))
+([link](https://www.rust-lang.org/))
 This will require some preparation:
-1. On any platform, for the installation we need only one instruction from here - [link] (https://rustup.rs)
+1. On any platform, for the installation we need only one instruction from here - [link](https://rustup.rs)
 2. After that, create a project anywhere with the command `cargo new rust_php_ffi`. And that’s it!
 
 Here is our function:
@@ -102,7 +102,7 @@ extern "C" fn Fib(n: i32) -> i32 {
 }
 ```
 
-It is very important not to forget to add the attribute # [no_mangle] to the required function, because otherwise the compiler will replace the name of your function with something like: `_аgs @ fs34`. And exporting it to PHP, libffi simply won’t be able to find a function named Fib in the dynamic library. You can read more here: [link] (https://en.wikipedia.org/wiki/Name_mangling).
+It is very important not to forget to add the attribute # [no_mangle] to the required function, because otherwise the compiler will replace the name of your function with something like: `_аgs @ fs34`. And exporting it to PHP, libffi simply won’t be able to find a function named Fib in the dynamic library. You can read more here: [link](https://en.wikipedia.org/wiki/Name_mangling).
 
 In Cargo.toml you need to add the attribute:
 `` ``
@@ -152,10 +152,10 @@ Golang
 
   And next in line is ‘Golang’.
  That is a language with runtime. A special mechanism for interacting with dynamic libraries was developed for Go, which is called - `CGO` 
-[link] (https://golang.org/cmd/cgo/ )
+[link](https://golang.org/cmd/cgo/ )
 This comment explains well how this mechanism works: 
 [link](https://github.com/golang/go/blob/860c9c0b8df6c0a2849fdd274a0a9f142cba3ea5/src/cmd/cgo/doc.go#L378-L471 )
-Also, due to the fact that CGO interprets the generated errors from C, there is no way to use optimizations, as we did in C ++ [link] (https://go-review.googlesource.com/c/go/+/23231 /) and [link] (https://go-review.googlesource.com/c/go/+/23231/2/src/cmd/cgo/gcc.go)
+Also, due to the fact that CGO interprets the generated errors from C, there is no way to use optimizations, as we did in C ++ [link](https://go-review.googlesource.com/c/go/+/23231 /) and [link](https://go-review.googlesource.com/c/go/+/23231/2/src/cmd/cgo/gcc.go)
 
 So, welcome the code:
 
@@ -216,7 +216,7 @@ Then we can go to the `php` folder and run our script (or via the Makefile -` ma
 
 As expected, PHP showed the lowest result in the CPU loaded with calculations, but nevertheless, on the whole, it’s pretty fast for a million calls.
 A surprise might seem to be the running time of CGO, a little less than PHP. In essence, this happens due to `calling-conventions` because of unstable ABI. CGO is forced to carry out type conversion operations from Go-types to C (you can see in the ‘h’ file that is obtained after building the GO dynamic library) types, as well as the fact that you have to copy the incoming and return values ​​for C and GO compatibility 
-[link] (https://en.wikipedia.org/wiki/X86_calling_conventions ).
+[link](https://en.wikipedia.org/wiki/X86_calling_conventions ).
 Rust and C ++ showed the best results as we had expected, since they have a stable ABI and the only layer between php and these languages ​​is libffi.
 
 Conclusion:
