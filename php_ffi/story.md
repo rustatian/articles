@@ -2,7 +2,7 @@ In this article, we’re going to consider the capabilities of FFI that was intr
 So, what is FFI: 
 [FFI](https://en.wikipedia.org/wiki/Foreign_function_interface)
 FFI is the ability to call a library function written in one language from another one. For example, as you might guess, it’s possible to call a function written in Rust/C++/Go from PHP. In order to connect an interpreted language with a compiled language, the libffilibrary is used: [Repo](https://en.wikipedia.org/wiki/Libffi). 
-Since the interpreted languages ​​do not know where specifically (in which registers) to search for the parameters of the called function, as well as where to get the results of the function after the call. All this work for interpreted languages ​​is done by Libffi. So, you need to install this library, as  it is part of the system libraries (Linux).
+Since the interpreted languages do not know where specifically (in which registers) to search for the parameters of the called function, as well as where to get the results of the function after the call. All this work for interpreted languages ​​is done by Libffi. So, you need to install this library, as  it is part of the system libraries (Linux).
 All the experiments will be conducted on ArchLinux (5.6.1 kernel), Libffi 3.2.1.
 What's the use of it? It is certainly interesting to explore new language features, but is there any practical sense in this? I’m going to try to prove this in the course of the article.
 So, PHP.
