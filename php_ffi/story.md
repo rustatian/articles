@@ -105,25 +105,20 @@ extern "C" fn Fib(n: i32) -> i32 {
 It is very important not to forget to add the attribute # [no_mangle] to the required function, because otherwise the compiler will replace the name of your function with something like: `_аgs @ fs34`. And exporting it to PHP, libffi simply won’t be able to find a function named Fib in the dynamic library. You can read more here: [link](https://en.wikipedia.org/wiki/Name_mangling).
 
 In Cargo.toml you need to add the attribute:
-`` ``
+```rust
 [lib]
 crate-type = ["cdylib"]
-
-`` ``
+```
 I would like to draw your attention to the fact that there are three options for a dynamic library through an attribute in Cargo.toml.
-1. dylib - Rust shared library with unstable ABI, which can change from version to version (as in ‘Go’ internal ABI)
-2. cdylib is a dynamic library for useing in C / C ++. This is our choice.
-3. rlib - Rust static library with rlib extestion (.rlib). It also contains metadata used to link various rlibs written respectively in Rust
+1. `dylib` - Rust shared library with unstable ABI, which can change from version to version (as in `Go` internal ABI)
+2. `cdylib` is a dynamic library for useing in C / C ++. This is our choice.
+3. `rlib` - Rust static library with rlib extestion (.rlib). It also contains metadata used to link various rlibs written respectively in Rust
 
 Let’s compile: `cargo build --release`. And in the folder `target / release` we see the` .so` file. This will be our dynamic library.
-C ++
+C++
 
 Next in line is C ++.
 Here everything is quite simple, too:
-
-
-
-
 
 ```cpp
 // in php_cpp_ffi.cpp
@@ -150,8 +145,9 @@ A few comments on the compilation:
 
 Golang
 
-  And next in line is ‘Golang’.
- That is a language with runtime. A special mechanism for interacting with dynamic libraries was developed for Go, which is called - `CGO` 
+And next in line is `Golang`.
+
+That is a language with runtime. A special mechanism for interacting with dynamic libraries was developed for Go, which is called - `CGO` 
 [link](https://golang.org/cmd/cgo/ )
 This comment explains well how this mechanism works: 
 [link](https://github.com/golang/go/blob/860c9c0b8df6c0a2849fdd274a0a9f142cba3ea5/src/cmd/cgo/doc.go#L378-L471 )
@@ -222,10 +218,10 @@ Rust and C ++ showed the best results as we had expected, since they have a stab
 Conclusion:
 
 Of course, it’s unlikely that this approach is currently ready for bloody production, as it can carry a lot of pitfalls. This is what php developers tell us about:
-`` ``
+```
 Warning
 
 This extension is EXPERIMENTAL. The behavior of this extension including the names of its functions and any other documentation surrounding this extension may change without notice in a future release of PHP. This extension should be used at your own risk.
-`` ``
+```
 There are no normal ways to work with the preprocessor.
 This article just shows the features of a new language feature. However, if this feature of PHP becomes stable, imagine how it would be possible to optimize hot spots in your code?
