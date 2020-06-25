@@ -1,4 +1,4 @@
-In this article, we’re going to consider the capabilities of FFI that was introduced in PHP version 7.4, plus we’re going to compare the abilities of PHP to work with such languages as ‘Go’, ‘Rust’, ‘C ++’ without creating plug-ins, but directly. Moreover, we’re going to cover the topic where it is possible to use this function, and where, in our opinion, it’s not worth doing it.
+In this article, we’re going to consider the capabilities of FFI that was introduced in PHP version 7.4, plus we’re going to compare the abilities of PHP to work with such languages as `Go`, `Rust`, `C++` without creating plug-ins, but directly. Moreover, we’re going to cover the topic where it is possible to use this function, and where, in our opinion, it’s not worth doing it.
 So, what is FFI: 
 [FFI](https://en.wikipedia.org/wiki/Foreign_function_interface)
 FFI is the ability to call a library function written in one language from another one. For example, as you might guess, it’s possible to call a function written in Rust/C++/Go from PHP. In order to connect an interpreted language with a compiled language, the libffilibrary is used: [Repo](https://en.wikipedia.org/wiki/Libffi). 
@@ -138,7 +138,7 @@ extern "C" int Fib(int n) {
 We need to declare the `extern` function so that it can be imported from php. 
 
 Let’s compile:
-`g ++ -fPIC -O3 -shared src / php_cpp_ffi.cpp -o ../ lib / libphp_cpp_ffi.so`. 
+`g++ -fPIC -O3 -shared src / php_cpp_ffi.cpp -o ../ lib / libphp_cpp_ffi.so`. 
 A few comments on the compilation:
   1. `-fPIC` position-independence code. For a dynamic library, it is important to be independent of the address at which it is loaded in memory.
   2. `-O3` - maximum optimization
