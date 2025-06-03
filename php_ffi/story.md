@@ -6,7 +6,7 @@ Since the interpreted languages do not know where specifically (in which registe
 All the experiments will be conducted on ArchLinux (5.6.1 kernel), Libffi 3.2.1.
 What's the use of it? It is certainly interesting to explore new language features, but is there any practical sense in this? I’m going to try to prove this in the course of the article.
 So, PHP.
-[link](https://www.php.net/manual/en/intro.ffi.php )
+[link](https://www.php.net/manual/en/intro.ffi.php)
 The title itself immediately describes that at the time of writing, this is an experimental feature of the PHP language.
 For our example, we are taking such an interesting problem as calculating the Fibonacci sequences. And of course, not in the most efficient way, — with the help of recursion. This is done in order to use the processor as much as possible, as well as to prevent compiled languages from optimizing this function (for example, applying the technique of unwinding cycle (https://en.wikipedia.org/wiki/Loop_unrolling )
 
@@ -146,10 +146,10 @@ A few comments on the compilation:
 And next in line is `Golang`.
 
 That is a language with runtime. A special mechanism for interacting with dynamic libraries was developed for Go, which is called - `CGO` 
-[link](https://golang.org/cmd/cgo/ )
+[link](https://golang.org/cmd/cgo/)
 This comment explains well how this mechanism works: 
-[link](https://github.com/golang/go/blob/860c9c0b8df6c0a2849fdd274a0a9f142cba3ea5/src/cmd/cgo/doc.go#L378-L471 )
-Also, due to the fact that CGO interprets the generated errors from C, there is no way to use optimizations, as we did in C ++ [link](https://go-review.googlesource.com/c/go/+/23231 /) and [link](https://go-review.googlesource.com/c/go/+/23231/2/src/cmd/cgo/gcc.go)
+[link](https://github.com/golang/go/blob/860c9c0b8df6c0a2849fdd274a0a9f142cba3ea5/src/cmd/cgo/doc.go#L378-L471)
+Also, since CGO interprets the generated errors from C, there is no way to use optimizations, as we did in C++ [link](https://go-review.googlesource.com/c/go/+/23231) and [link](https://go-review.googlesource.com/c/go/+/23231/2/src/cmd/cgo/gcc.go)
 
 So, welcome the code:
 
@@ -175,9 +175,9 @@ func Fib(n C.int) C.int {
         return Fib(n-1) + Fib(n-2)
 }
 ```
-So, all this is the same Fib function, however, in order for this function to be exported in a dynamic library, we need to add the comment above (a sort of GO attribute) `// export Fib`.
-Let’s compile: `go build -o ../lib/libphp_go_ffi.so -buildmode = c-shared`. I’ll also pay attention that we need to add `-buildmode = c-shared` in order to get a dynamic library.
- We get 2 files at the output. A file with the headers `.h` and` .so` is a dynamic library. We do not really need the file with headers, since we know the name of the function, and FFI php is rather limited in working with the C preprocessor.
+So, all this is the same Fib function, however, for this function to be exported in a dynamic library, we need to add the comment above (a sort of GO attribute) `// export Fib`.
+Let’s compile: `go build -o ../lib/libphp_go_ffi.so -buildmode = c-shared`. I’ll also pay attention that we need to add `-buildmode = c-shared` to get a dynamic library.
+ We get 2 files at the output. A file with the headers `.h` and` .so` is a dynamic library. We do not need the file with headers, since we know the name of the function, and FFI php is rather limited in working with the C preprocessor.
 
 Rocket launch:
 After we’ve written everything (source codes are provided), we can make a small Makefile to collect all this (it is also located in the repository). After we call `make build` in the` lib` folder, 4 files will appear. Two for GO (.h / .so) and one for Rust and C ++.
@@ -208,7 +208,7 @@ Then we can go to the `php` folder and run our script (or via the Makefile -` ma
 3. [CPP] execution time: 0.3515248298645 Result: 144
 4. [GOLANG] execution time: 5.0730509757996 Result: 144
 
-As expected, PHP showed the lowest result in the CPU loaded with calculations, but nevertheless, on the whole, it’s pretty fast for a million calls.
+As expected, PHP showed the lowest result in the CPU loaded with calculations, but on the whole, it’s pretty fast for a million calls.
 A surprise might seem to be the running time of CGO, a little less than PHP. In essence, this happens due to `calling-conventions` because of unstable ABI. CGO is forced to carry out type conversion operations from Go-types to C (you can see in the ‘h’ file that is obtained after building the GO dynamic library) types, as well as the fact that you have to copy the incoming and return values ​​for C and GO compatibility 
 [link](https://en.wikipedia.org/wiki/X86_calling_conventions ).
 Rust and C ++ showed the best results as we had expected, since they have a stable ABI and the only layer between php and these languages ​​is libffi.
