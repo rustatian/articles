@@ -1,9 +1,9 @@
 # Table of contents
 
-## 😃 General
+## 1️⃣ General
 
 * [FFI](php_ffi/story.md)
 
-## 😃 Algorithms
+## 2️⃣ Algorithms
 
 * [Bitwise-And](algorithms/bitwise_and_task.md)
